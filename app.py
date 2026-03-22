@@ -5,16 +5,16 @@ import os
 app = Flask(__name__)
 app.secret_key = 'student_tracker_secret_key'
 
-DATABASE = 'results.db'
+# ✅ CHANGE 1: Absolute path for DATABASE
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DATABASE = os.path.join(BASE_DIR, 'results.db')
 
 def get_db():
-    """Get database connection."""
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
-    """Initialize the database and create tables."""
     conn = get_db()
     conn.execute('''
         CREATE TABLE IF NOT EXISTS results (
@@ -29,6 +29,10 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
+
+# ✅ CHANGE 2: Call init_db() at module level so gunicorn triggers it
+init_db()
+
 
 def calculate_grade(marks, total):
     """Calculate grade and pass/fail based on marks."""
