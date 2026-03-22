@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Success — ResultTrack{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-5 text-center">
+
+      <div class="card fade-in p-5">
+        <div class="success-circle">✓</div>
+
+        <h2 class="mb-1" style="font-family: 'Syne', sans-serif; font-weight: 800;">
+          Result Added!
+        </h2>
+        <p class="text-muted mb-4">{{ name }}'s result has been saved successfully.</p>
+
+        <!-- Grade display -->
+        <div class="big-grade mb-1
+          {% if grade == 'A+' %}grade-a-plus
+          {% elif grade == 'A' %}grade-a
+          {% elif grade == 'B' %}grade-b
+          {% elif grade == 'C' %}grade-c
+          {% elif grade == 'D' %}grade-d
+          {% else %}grade-f{% endif %}">
+          {{ grade }}
+        </div>
+        <div class="text-muted mb-4">{{ marks }} / {{ total }} &mdash; {{ percentage }}%</div>
+
+        <div class="mb-4">
+          <span class="status-{{ status | lower }} fs-5">
+            <i class="bi bi-{% if status == 'Pass' %}check-circle-fill{% else %}x-circle-fill{% endif %} me-1"></i>
+            {{ status }}
+          </span>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-center">
+          <a href="{{ url_for('submit') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Add Another
+          </a>
+          <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-house me-1"></i>View All
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

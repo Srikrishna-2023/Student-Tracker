@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Add Result — ResultTrack{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <h1 class="fade-in"><i class="bi bi-plus-circle me-2 text-primary"></i>Add Result</h1>
+    <p class="fade-in fade-in-1">Enter student marks and subject details</p>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+
+      <div class="card fade-in">
+        <div class="card-header">
+          <i class="bi bi-pencil-square me-2"></i>Student Result Form
+        </div>
+        <div class="card-body p-4">
+
+          <form id="resultForm" method="POST" action="{{ url_for('submit') }}" novalidate>
+
+            <!-- Row 1: Student ID + Name -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-5">
+                <label class="form-label" for="student_id">Student ID</label>
+                <input type="text" class="form-control" id="student_id" name="student_id"
+                       placeholder="e.g. STU-001"
+                       value="{{ form_data.get('student_id', '') }}">
+                <div class="invalid-feedback"></div>
+              </div>
+              <div class="col-md-7">
+                <label class="form-label" for="name">Full Name</label>
+                <input type="text" class="form-control" id="name" name="name"
+                       placeholder="e.g. John Smith"
+                       value="{{ form_data.get('name', '') }}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+
+            <!-- Subject -->
+            <div class="mb-3">
+              <label class="form-label" for="subject">Subject</label>
+              <select class="form-select" id="subject" name="subject">
+                <option value="" disabled {% if not form_data.get('subject') %}selected{% endif %}>
+                  Select a subject
+                </option>
+                {% for subj in ['Mathematics', 'Physics', 'Chemistry', 'Biology',
+                                 'Computer Science', 'English', 'History',
+                                 'Geography', 'Economics', 'Other'] %}
+                <option value="{{ subj }}"
+                  {% if form_data.get('subject') == subj %}selected{% endif %}>
+                  {{ subj }}
+                </option>
+                {% endfor %}
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+
+            <!-- Row 2: Marks + Total -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label" for="marks">Marks Obtained</label>
+                <input type="number" class="form-control" id="marks" name="marks"
+                       placeholder="e.g. 78" min="0"
+                       value="{{ form_data.get('marks', '') }}">
+                <div class="invalid-feedback"></div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="total">Total Marks</label>
+                <input type="number" class="form-control" id="total" name="total"
+                       placeholder="e.g. 100" min="1"
+                       value="{{ form_data.get('total', '100') }}">
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+
+            <!-- Live Preview -->
+            <div id="previewBox" class="d-none p-3 mb-4 rounded"
+                 style="background: var(--bg3); border: 1px solid var(--border);">
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="bi bi-check-lg me-1"></i>Submit Result
+              </button>
+              <button type="reset" class="btn btn-outline-secondary" id="resetBtn">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+              </button>
+              <a href="{{ url_for('index') }}" class="btn btn-outline-secondary ms-auto">
+                <i class="bi bi-arrow-left me-1"></i>Back
+              </a>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

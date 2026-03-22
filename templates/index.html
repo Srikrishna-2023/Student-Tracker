@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block title %}Home — ResultTrack{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <h1 class="fade-in"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>All Results</h1>
+        <p class="fade-in fade-in-1">Track and manage student performance</p>
+      </div>
+      <a href="{{ url_for('submit') }}" class="btn btn-primary fade-in fade-in-2">
+        <i class="bi bi-plus-lg me-1"></i>Add Result
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+
+  <!-- Stats Row -->
+  {% if results %}
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3 fade-in fade-in-1">
+      <div class="stat-card">
+        <div class="stat-number text-primary">{{ results | length }}</div>
+        <div class="stat-label">Total Results</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 fade-in fade-in-2">
+      <div class="stat-card">
+        <div class="stat-number" style="color: #38c9a0;">
+          {{ results | selectattr('status', 'equalto', 'Pass') | list | length }}
+        </div>
+        <div class="stat-label">Passed</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 fade-in fade-in-3">
+      <div class="stat-card">
+        <div class="stat-number" style="color: #f75f5f;">
+          {{ results | selectattr('status', 'equalto', 'Fail') | list | length }}
+        </div>
+        <div class="stat-label">Failed</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 fade-in fade-in-4">
+      <div class="stat-card">
+        <div class="stat-number text-warning">
+          {% set total_pct = results | map(attribute='percentage') | list %}
+          {% if total_pct %}
+            {{ "%.1f"|format(total_pct | sum / total_pct | length) }}%
+          {% else %}
+            0%
+          {% endif %}
+        </div>
+        <div class="stat-label">Avg Percentage</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Search Bar -->
+  {% if results %}
+  <div class="mb-3 fade-in">
+    <div class="search-wrap" style="max-width: 340px;">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" id="searchInput" class="form-control"
+             placeholder="Filter by name or ID...">
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Results Table -->
+  <div class="card fade-in">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <span><i class="bi bi-table me-2"></i>Results</span>
+      <span class="text-muted" style="font-size:0.8rem; font-weight:400;">
+        {{ results | length }} record{% if results | length != 1 %}s{% endif %}
+      </span>
+    </div>
+
+    {% if results %}
+    <div class="table-responsive">
+      <table class="table" id="resultsTable">
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Subject</th>
+            <th>Marks</th>
+            <th>Percentage</th>
+            <th>Grade</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in results %}
+<tr>
+  <td>
+    <span style="font-family: monospace; color: var(--text-dim);">{{ r.student_id }}</span>
+  </td>
+  <td><strong>{{ r.name }}</strong></td>
+  <td>{{ r.subject }}</td>
+  <td>
+    <div>{{ r.marks }} / {{ r.total }}</div>
+    <div class="marks-bar">
+      <div class="marks-bar-fill"
+           data-width="{{ r.percentage }}"
+           style="background: {% if r.percentage >= 75 %}#38c9a0{% elif r.percentage >= 50 %}#4f8ef7{% else %}#f75f5f{% endif %};">
+      </div>
+    </div>
+  </td>
+  <td><strong>{{ r.percentage }}%</strong></td>
+  <td>
+    <span class="badge-grade grade-{{ r.grade | lower | replace('+', '-plus') }}">
+      {{ r.grade }}
+    </span>
+  </td>
+  <td>
+    <span class="status-{{ r.status | lower }}">
+      <i class="bi bi-{% if r.status == 'Pass' %}check-circle{% else %}x-circle{% endif %} me-1"></i>
+      {{ r.status }}
+    </span>
+  </td>
+  <td>
+    <form method="POST" action="{{ url_for('delete', id=r.id) }}"
+          class="delete-form" style="display:inline;">
+      <button type="submit" class="btn btn-sm"
+              style="background: rgba(247,95,95,0.1); color: #f75f5f; border: 1px solid rgba(247,95,95,0.3);">
+        <i class="bi bi-trash"></i>
+      </button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- No results after filter -->
+    <div id="noResults" class="d-none empty-state">
+      <div class="empty-icon"><i class="bi bi-search"></i></div>
+      <p>No results match your search.</p>
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+      <h5>No results yet</h5>
+      <p>Start by adding a student result.</p>
+      <a href="{{ url_for('submit') }}" class="btn btn-primary mt-2">
+        <i class="bi bi-plus-lg me-1"></i>Add First Result
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

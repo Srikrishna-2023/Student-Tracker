@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}Search — ResultTrack{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <h1 class="fade-in"><i class="bi bi-search me-2 text-primary"></i>Search Results</h1>
+    <p class="fade-in fade-in-1">Find results by student name or ID</p>
+  </div>
+</div>
+
+<div class="container pb-5">
+
+  <!-- Search Form -->
+  <div class="card mb-4 fade-in">
+    <div class="card-body p-4">
+      <form method="GET" action="{{ url_for('search') }}" id="searchForm">
+        <div class="row g-2 align-items-end">
+          <div class="col">
+            <label class="form-label" for="q">Search Query</label>
+            <div class="search-wrap">
+              <i class="bi bi-search search-icon"></i>
+              <input type="text" class="form-control" id="q" name="q"
+                     placeholder="Enter student name or ID..."
+                     value="{{ query }}">
+            </div>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-search me-1"></i>Search
+            </button>
+          </div>
+          {% if query %}
+          <div class="col-auto">
+            <a href="{{ url_for('search') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-x me-1"></i>Clear
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Results -->
+  {% if query %}
+  <div class="card fade-in">
+    <div class="card-header">
+      <i class="bi bi-list-ul me-2"></i>
+      {% if results %}
+        {{ results | length }} result{% if results | length != 1 %}s{% endif %} for
+        "<strong>{{ query }}</strong>"
+      {% else %}
+        No results found for "<strong>{{ query }}</strong>"
+      {% endif %}
+    </div>
+
+    {% if results %}
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Subject</th>
+            <th>Marks</th>
+            <th>Percentage</th>
+            <th>Grade</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in results %}
+          <tr>
+            <td><span style="font-family: monospace; color: var(--text-dim);">{{ r.student_id }}</span></td>
+            <td><strong>{{ r.name }}</strong></td>
+            <td>{{ r.subject }}</td>
+            <td>
+              <div>{{ r.marks }} / {{ r.total }}</div>
+              <div class="marks-bar">
+                <div class="marks-bar-fill"
+                     data-width="{{ r.percentage }}"
+                     style="background: {% if r.percentage >= 75 %}#38c9a0{% elif r.percentage >= 50 %}#4f8ef7{% else %}#f75f5f{% endif %};">
+                </div>
+              </div>
+            </td>
+            <td><strong>{{ r.percentage }}%</strong></td>
+            <td>
+              <span class="badge-grade grade-{{ r.grade | lower | replace('+', '-plus') }}">
+                {{ r.grade }}
+              </span>
+            </td>
+            <td>
+              <span class="status-{{ r.status | lower }}">
+                <i class="bi bi-{% if r.status == 'Pass' %}check-circle{% else %}x-circle{% endif %} me-1"></i>
+                {{ r.status }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon"><i class="bi bi-person-x"></i></div>
+      <h5>No matches found</h5>
+      <p>Try searching with a different name or student ID.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  {% else %}
+  <div class="empty-state fade-in">
+    <div class="empty-icon"><i class="bi bi-search"></i></div>
+    <h5>Enter a search term</h5>
+    <p>Search by student name or student ID to find results.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
